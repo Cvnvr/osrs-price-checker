@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace OsrsPriceChecker
 {
-	public enum RequestType { GET, POST, PUT, DELETE };
 	public enum ItemType { Item, Weapon, Equipment };
 
 	class WebAPI
@@ -18,16 +17,11 @@ namespace OsrsPriceChecker
 		private readonly string equipmentEndPoint = "https://api.osrsbox.com/equipment";
 		#endregion Variables
 
-		public async Task<string> HttpRequest(ItemType itemType, RequestType requestType, string userInput)
+		public async Task<string> HttpRequest(ItemType itemType, string userInput)
 		{
-			if (requestType != RequestType.GET)
-			{
-				return "";
-			}
-
 			// Contact end point
 			HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(GetCorrespondingEndPoint());
-			webRequest.Method = requestType.ToString();
+			webRequest.Method = "GET";
 
 			HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse();
 
