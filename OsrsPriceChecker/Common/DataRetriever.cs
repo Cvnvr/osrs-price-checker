@@ -15,28 +15,28 @@ namespace OsrsPriceChecker
 		private List<Item> items = new List<Item>();
 		#endregion Variables
 
-		public async void MakeTheRequest(ItemType type, string userInput)
+		public async void GetItemData(ItemType type, string userInput)
 		{
 			api = new WebAPI();
-			string json = "";
+			string jsonString = "";
 
 			switch (type)
 			{
 				case ItemType.Item:
-					json = await api.HttpRequest(ItemType.Item, RequestType.GET, userInput);
+					jsonString = await api.HttpRequest(ItemType.Item, userInput);
 					break;
 				case ItemType.Weapon:
-					json = await api.HttpRequest(ItemType.Weapon, RequestType.GET, userInput);
+					jsonString = await api.HttpRequest(ItemType.Weapon, userInput);
 					break;
 				case ItemType.Equipment:
-					json = await api.HttpRequest(ItemType.Equipment, RequestType.GET, userInput);
+					jsonString = await api.HttpRequest(ItemType.Equipment, userInput);
 					break;
 			}
 
-			ParseJson(json);
+			DeserializeJson(jsonString);
 		}
 
-		private void ParseJson(string jsonString)
+		private void DeserializeJson(string jsonString)
 		{
 			if (string.IsNullOrEmpty(jsonString))
 			{
@@ -45,6 +45,11 @@ namespace OsrsPriceChecker
 
 			ItemsList itemsList = JsonConvert.DeserializeObject<ItemsList>(jsonString);
 			items = itemsList.Items;
+
+			for (int i = 0; i < items.Count; i++)
+			{
+				Console.WriteLine(string.Format("Name: {0}, \t\tCost: {1}", items[i].Name, items[i].Cost.ToString("N0")));
+			}
 		}
 	}
 }

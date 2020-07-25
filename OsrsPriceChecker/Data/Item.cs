@@ -20,15 +20,15 @@ namespace OsrsPriceChecker
         public string Name { get; set; }
 
         [JsonProperty("members")]
-        public bool Members { get; set; }
+        public bool IsMembers { get; set; }
 
         [JsonProperty("cost")]
         public int Cost { get; set; }
 
         [JsonProperty("lowalch")]
-        public int? Lowalch { get; set; }
+        public int? LowAlchPrice { get; set; }
 
         [JsonProperty("highalch")]
-        public int? Highalch { get; set; }
+        public int? HighAlchPrice { get; set; }
     }
 }
