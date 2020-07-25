@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace OsrsPriceChecker
 {
@@ -11,7 +12,6 @@ namespace OsrsPriceChecker
 		#region Variables
 		private WebAPI api;
 
-		// Result from GET request
 		private List<Item> items = new List<Item>();
 		#endregion Variables
 
@@ -43,9 +43,8 @@ namespace OsrsPriceChecker
 				return;
 			}
 
-			Console.WriteLine(jsonString);
-			Console.ReadLine();
-			// List<Item> items = JsonConvert.DeserializeObject<List<Item>>(jsonString);
+			ItemsList itemsList = JsonConvert.DeserializeObject<ItemsList>(jsonString);
+			items = itemsList.Items;
 		}
 	}
 }
