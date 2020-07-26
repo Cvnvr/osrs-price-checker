@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace OsrsPriceChecker
 {
-	class DataRetriever
+	public class DataRetriever
 	{
 		#region Variables
 		private WebAPI api;
@@ -17,23 +17,31 @@ namespace OsrsPriceChecker
 
 		public async void GetItemData(ItemType type, string userInput)
 		{
-			api = new WebAPI();
-			string jsonString = "";
-
-			switch (type)
+			try
 			{
-				case ItemType.Item:
-					jsonString = await api.HttpRequest(ItemType.Item, userInput);
-					break;
-				case ItemType.Weapon:
-					jsonString = await api.HttpRequest(ItemType.Weapon, userInput);
-					break;
-				case ItemType.Equipment:
-					jsonString = await api.HttpRequest(ItemType.Equipment, userInput);
-					break;
-			}
+				api = new WebAPI();
+				string jsonString = "";
 
-			DeserializeJson(jsonString);
+				switch (type)
+				{
+					case ItemType.Item:
+						jsonString = await api.HttpRequest(ItemType.Item, userInput);
+						break;
+					case ItemType.Weapon:
+						jsonString = await api.HttpRequest(ItemType.Weapon, userInput);
+						break;
+					case ItemType.Equipment:
+						jsonString = await api.HttpRequest(ItemType.Equipment, userInput);
+						break;
+				}
+
+				DeserializeJson(jsonString);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				throw;
+			}
 		}
 
 		private void DeserializeJson(string jsonString)

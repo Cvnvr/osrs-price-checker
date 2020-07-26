@@ -9,7 +9,7 @@ namespace OsrsPriceChecker
 {
 	public enum ItemType { Item, Weapon, Equipment };
 
-	class WebAPI
+	public class WebAPI
 	{
 		#region Variables
 		private readonly string itemEndPoint = "https://api.osrsbox.com/items";
@@ -19,8 +19,10 @@ namespace OsrsPriceChecker
 
 		public async Task<string> HttpRequest(ItemType itemType, string userInput)
 		{
+			string endPoint = GetCorrespondingEndPoint() + FormatSearchParamater(userInput);
+
 			// Contact end point
-			HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(GetCorrespondingEndPoint());
+			HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(endPoint);
 			webRequest.Method = "GET";
 
 			HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse();
@@ -51,6 +53,33 @@ namespace OsrsPriceChecker
 				}
 			}
 			#endregion Local Functions
+		}
+
+		private string FormatSearchParamater(string userInput)
+		{
+			string formattedInput = Helpers.Helper.FirstLetterToUpperCase(userInput);
+
+			// Validate where there are multiple words
+			if (!formattedInput.Contains(' '))
+			{
+				return string.Format("?where={\"name\":\"{0}\"}", formattedInput);
+			}
+
+			string[] words = formattedInput.Split(' ');
+			string userQuery = "";
+
+			for (int i = 0; i < words.Length; i++)
+			{
+				if (i == 0)
+				{
+					userQuery = words[i];
+					continue;
+				}
+
+				userQuery += string.Format("%20{0}", words[i]);
+			}
+
+			return string.Format("?where={\"name\":\"{0}\"}", userQuery);
 		}
 	}
 }

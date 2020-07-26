@@ -2,7 +2,7 @@
 
 namespace OsrsPriceChecker
 {
-	class UserInputRecorder
+	public class UserInputRecorder
 	{
 		private static void Main(string[] args)
 		{
@@ -59,7 +59,7 @@ namespace OsrsPriceChecker
 						return ItemType.Equipment;
 				}
 			}
-			#endregion
+			#endregion Local Functions
 		}
 
 		private static string GetItemNameFromUser()
