@@ -2,48 +2,33 @@
 
 namespace OsrsPriceChecker
 {
+	public enum ItemType { Item, Weapon, Equipment };
+
 	public class Program
 	{
-		public static WebAPI webAPI;
-		public static DataRetriever dataRetriever;
-
 		private static void Main(string[] args)
 		{
-			InitialiseScriptReferences();
-
 			Console.WriteLine("\n----------------------------------\n");
 			Console.WriteLine("Welcome to the OSRS Price Checker!");
 			Console.WriteLine("\n----------------------------------\n");
-
-			GetAllItems();
 
 			// Get required input from user
 			ItemType itemType = GetCategoryFromUser();
 			string itemName = GetItemNameFromUser();
 
-			// Make API call using the user input
-			dataRetriever.ParseItemData(itemName);
-		}
+			DataRetriever dataRetriever = new DataRetriever();
+			if (itemType == ItemType.Item)
+			{
+				dataRetriever.FetchAllItems();
 
-		private static void InitialiseScriptReferences()
-		{
-			webAPI = new WebAPI();
-			dataRetriever = new DataRetriever();
-		}
-
-		private static async void GetAllItems()
-		{
-			Console.WriteLine("Retrieving item data from API...\n");
-
-			await webAPI.GetCoreItemData();
-
-			Console.WriteLine("Done!\n");
+				dataRetriever.ParseItemData(itemName);
+			}
 		}
 
 		private static ItemType GetCategoryFromUser()
 		{
 			// Determine category from user
-			Console.WriteLine("\n\nSelect what category the item belongs to ('item', 'weapon', or 'equipment'):");
+			Console.WriteLine("\nSelect what category the item belongs to ('item', 'weapon', or 'equipment'):");
 			string category = Console.ReadLine();
 			while (!IsCategoryValid())
 			{
@@ -83,7 +68,7 @@ namespace OsrsPriceChecker
 
 		private static string GetItemNameFromUser()
 		{
-			Console.WriteLine("\n\nEnter the name of the object:");
+			Console.WriteLine("\nEnter the name of the object:");
 
 			return Console.ReadLine();
 

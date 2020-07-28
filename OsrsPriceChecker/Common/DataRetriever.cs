@@ -10,63 +10,61 @@ namespace OsrsPriceChecker
 	public class DataRetriever
 	{
 		#region Variables
-		private List<CoreItemData> filteredData = new List<CoreItemData>();
-		private List<Item> items = new List<Item>();
+		private WebAPI webAPI;
 
-		public List<CoreItemData> FilteredData { get => filteredData; }
+		private List<CoreItemData> allItemData = new List<CoreItemData>();
+		private static List<CoreItemData> filteredData = new List<CoreItemData>();
 		#endregion Variables
 
-		public async void ParseItemData(string userInput)
+		public void FetchAllItems()
 		{
-			Console.WriteLine(string.Format("\nSearching for 'item': {0}...", userInput));
+			Console.WriteLine("\nFetching all item data...");
 
-			for (int i = 0; i < Program.webAPI.AllItems.Count; i++)
+			webAPI = new WebAPI();
+			allItemData = webAPI.FetchCoreItemData();
+
+			Console.WriteLine("Done!");
+		}
+
+		public void ParseItemData(string userInput)
+		{
+			Console.WriteLine($"\nSearching for 'item': '{userInput}'...\n");
+
+			for (int i = 0; i < allItemData.Count; i++)
 			{
-				if (Program.webAPI.AllItems[i].Name.ToLower().Contains(userInput.ToLower()))
+				if (allItemData[i].Name.ToLower().Contains(userInput.ToLower()))
 				{
-					filteredData.Add(Program.webAPI.AllItems[i]);
+					filteredData.Add(allItemData[i]);
 				}
 			}
 
-			await Program.webAPI.ParseFilteredItemData();
+			ParseFilteredItemData();
 		}
 
-		public async void GetItemData(ItemType type, string userInput)
+		private void ParseFilteredItemData()
 		{
-			try
-			{
-				string jsonString = "";
+			List<string> jsonStrings = webAPI.ReturnFilteredItemResults(filteredData);
 
-				switch (type)
+			List<Item> items = new List<Item>();
+			for (int i = 0; i < jsonStrings.Count; i++)
+			{
+				if (string.IsNullOrEmpty(jsonStrings[i]))
 				{
-					case ItemType.Item:
-						break;
-					case ItemType.Weapon:
-						await Program.webAPI.ParseEndPoint(ItemType.Weapon, userInput);
-						break;
-					case ItemType.Equipment:
-						await Program.webAPI.ParseEndPoint(ItemType.Equipment, userInput);
-						break;
+					continue;
 				}
 
-				DeserializeJson(jsonString);
+				items.Add(JsonConvert.DeserializeObject<Item>(jsonStrings[i]));
 			}
-			catch (Exception e)
-			{
-				Console.WriteLine("Operation failed. Exiting...");
-				throw;
-			}
+
+			DisplayCostOfItems(items);
 		}
 
-		private void DeserializeJson(string jsonString)
+		private void DisplayCostOfItems(List<Item> items)
 		{
-			if (string.IsNullOrEmpty(jsonString))
+			for (int i = 0; i < items.Count; i++)
 			{
-				return;
+				Console.WriteLine($"The cost of '{items[i].Name}' is: {items[i].Cost.ToString("N0")}gp");
 			}
-
-			ItemsList itemsList = JsonConvert.DeserializeObject<ItemsList>(jsonString);
-			items = itemsList.Items;
 		}
 	}
 }

@@ -8,35 +8,33 @@ using System.Threading.Tasks;
 
 namespace OsrsPriceChecker
 {
-	public enum ItemType { Item, Weapon, Equipment };
-
 	public class WebAPI
 	{
 		#region Variables
-		// All items data
+		// Items
 		private readonly string allItemsEndPoint = "https://raw.githubusercontent.com/osrsbox/osrsbox-db/master/docs/items-search.json";
-		private List<CoreItemData> allItems = new List<CoreItemData>();
-
-		// Query end points
 		private readonly string itemEndPoint = "https://api.osrsbox.com/items";
-		private readonly string weaponEndPoint = "https://api.osrsbox.com/weapons";
-		private readonly string equipmentEndPoint = "https://api.osrsbox.com/equipment";
 
-		public List<CoreItemData> AllItems { get => allItems; }
+		// Weapons
+		private readonly string allWeaponsEndPoint = "";
+		private readonly string weaponEndPoint = "https://api.osrsbox.com/weapons";
+
+		// Equipment
+		private readonly string allEquipmentEndPoint = "";
+		private readonly string equipmentEndPoint = "https://api.osrsbox.com/equipment";
 		#endregion Variables
 
-		public async Task GetCoreItemData()
+		public List<CoreItemData> FetchCoreItemData()
 		{
-			string jsonString = await HttpRequest(allItemsEndPoint);
-
+			string jsonString = HttpRequest(allItemsEndPoint);
 			if (string.IsNullOrEmpty(jsonString))
 			{
-				return;
+				return null;
 			}
 
 			// Parse json string into data object
 			Dictionary<string, CoreItemData> myDict = JsonConvert.DeserializeObject<Dictionary<string, CoreItemData>>(jsonString);
-			allItems = new List<CoreItemData>(myDict.Values);
+			List<CoreItemData> allItems = new List<CoreItemData>(myDict.Values);
 
 			// Remove duplicates from list
 			for (int i = allItems.Count - 1; i >= 0; i--)
@@ -46,75 +44,24 @@ namespace OsrsPriceChecker
 					allItems.RemoveAt(i);
 				}
 			}
+
+			return allItems;
 		}
 
-		public async Task ParseFilteredItemData()
+		public List<string> ReturnFilteredItemResults(List<CoreItemData> filteredData)
 		{
 			List<string> jsonStrings = new List<string>();
 
-			for (int i = 0; i < Program.dataRetriever.FilteredData.Count; i++)
+			for (int i = 0; i < filteredData.Count; i++)
 			{
-				string endPoint = $"{itemEndPoint}/{Program.dataRetriever.FilteredData[i].Id}";
-				jsonStrings.Add(await HttpRequest(endPoint));
+				string endPoint = $"{itemEndPoint}/{filteredData[i].Id}";
+				jsonStrings.Add(HttpRequest(endPoint));
 			}
 
-			List<Item> items = new List<Item>();
-			for (int i = 0; i < jsonStrings.Count; i++)
-			{
-				if (string.IsNullOrEmpty(jsonStrings[i]))
-				{
-					continue;
-				}
-
-				items.Add(JsonConvert.DeserializeObject<Item>(jsonStrings[i]));
-				Console.WriteLine($"The cost of {items[items.Count - 1].Name} is: {items[items.Count - 1].Cost}");
-			}
+			return jsonStrings;
 		}
 
-		public async Task ParseEndPoint(ItemType itemType, string userInput)
-		{
-			string endPoint = GetCorrespondingEndPoint() + FormatSearchParamater(userInput);
-			string jsonString = await HttpRequest(endPoint);
-
-			#region Local Functions
-			string GetCorrespondingEndPoint()
-			{
-				switch (itemType)
-				{
-					case ItemType.Item:
-						return itemEndPoint;
-					case ItemType.Weapon:
-						return weaponEndPoint;
-					case ItemType.Equipment:
-						return equipmentEndPoint;
-					default:
-						return "ERROR";
-				}
-			}
-			#endregion Local Functions
-		}
-
-		private string FormatSearchParamater(string userInput)
-		{
-			// Directly return formatted query if it's a single word
-			if (!userInput.Contains(' '))
-			{
-				return $"?where={{\"name\":\"{userInput}\"}}";
-			}
-
-			// Split sentence into individual words to inject "%20" between them
-			string[] words = userInput.Split(' ');
-			string userQuery = "";
-
-			for (int i = 0; i < words.Length; i++)
-			{
-				userQuery += (i == 0) ? words[i] : string.Format("%20{0}", words[i]);
-			}
-
-			return $"?where={{\"name\":\"{userQuery}\"}}";
-		}
-
-		private async Task<string> HttpRequest(string endPoint)
+		private string HttpRequest(string endPoint)
 		{
 			// Contact end point
 			HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(endPoint);
