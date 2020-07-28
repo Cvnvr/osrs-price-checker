@@ -4,24 +4,27 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OsrsPriceChecker.Connector;
 
-namespace OsrsPriceChecker
+namespace OsrsPriceChecker.Common
 {
 	public class DataRetriever
 	{
 		#region Variables
-		private WebAPI webAPI;
-
 		private List<CoreItemData> allItemData = new List<CoreItemData>();
 		private static List<CoreItemData> filteredData = new List<CoreItemData>();
 		#endregion Variables
 
-		public void FetchAllItems()
+		public void FetchCoreData()
+		{
+			FetchAllItems();
+		}
+
+		private void FetchAllItems()
 		{
 			Console.WriteLine("\nFetching all item data...");
 
-			webAPI = new WebAPI();
-			allItemData = webAPI.FetchCoreItemData();
+			allItemData = Program.webAPI.FetchCoreItemData();
 
 			Console.WriteLine("Done!");
 		}
@@ -43,7 +46,7 @@ namespace OsrsPriceChecker
 
 		private void ParseFilteredItemData()
 		{
-			List<string> jsonStrings = webAPI.ReturnFilteredItemResults(filteredData);
+			List<string> jsonStrings = Program.webAPI.ReturnFilteredItemResults(filteredData);
 
 			List<Item> items = new List<Item>();
 			for (int i = 0; i < jsonStrings.Count; i++)
@@ -65,6 +68,8 @@ namespace OsrsPriceChecker
 			{
 				Console.WriteLine($"The cost of '{items[i].Name}' is: {items[i].Cost.ToString("N0")}gp");
 			}
+
+			Program.searchHandler.EndSearchSequence();
 		}
 	}
 }
