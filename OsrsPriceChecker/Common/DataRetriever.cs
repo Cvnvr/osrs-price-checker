@@ -10,28 +10,42 @@ namespace OsrsPriceChecker
 	public class DataRetriever
 	{
 		#region Variables
-		private WebAPI api;
-
+		private List<CoreItemData> filteredData = new List<CoreItemData>();
 		private List<Item> items = new List<Item>();
+
+		public List<CoreItemData> FilteredData { get => filteredData; }
 		#endregion Variables
+
+		public async void ParseItemData(string userInput)
+		{
+			Console.WriteLine(string.Format("\nSearching for 'item': {0}...", userInput));
+
+			for (int i = 0; i < Program.webAPI.AllItems.Count; i++)
+			{
+				if (Program.webAPI.AllItems[i].Name.ToLower().Contains(userInput.ToLower()))
+				{
+					filteredData.Add(Program.webAPI.AllItems[i]);
+				}
+			}
+
+			await Program.webAPI.ParseFilteredItemData();
+		}
 
 		public async void GetItemData(ItemType type, string userInput)
 		{
 			try
 			{
-				api = new WebAPI();
 				string jsonString = "";
 
 				switch (type)
 				{
 					case ItemType.Item:
-						jsonString = await api.HttpRequest(ItemType.Item, userInput);
 						break;
 					case ItemType.Weapon:
-						jsonString = await api.HttpRequest(ItemType.Weapon, userInput);
+						await Program.webAPI.ParseEndPoint(ItemType.Weapon, userInput);
 						break;
 					case ItemType.Equipment:
-						jsonString = await api.HttpRequest(ItemType.Equipment, userInput);
+						await Program.webAPI.ParseEndPoint(ItemType.Equipment, userInput);
 						break;
 				}
 
@@ -39,7 +53,7 @@ namespace OsrsPriceChecker
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e);
+				Console.WriteLine("Operation failed. Exiting...");
 				throw;
 			}
 		}
@@ -53,11 +67,6 @@ namespace OsrsPriceChecker
 
 			ItemsList itemsList = JsonConvert.DeserializeObject<ItemsList>(jsonString);
 			items = itemsList.Items;
-
-			for (int i = 0; i < items.Count; i++)
-			{
-				Console.WriteLine(string.Format("Name: {0}, \t\tCost: {1}", items[i].Name, items[i].Cost.ToString("N0")));
-			}
 		}
 	}
 }

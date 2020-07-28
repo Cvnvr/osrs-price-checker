@@ -2,23 +2,42 @@
 
 namespace OsrsPriceChecker
 {
-	public class UserInputRecorder
+	public class Program
 	{
+		public static WebAPI webAPI;
+		public static DataRetriever dataRetriever;
+
 		private static void Main(string[] args)
 		{
+			InitialiseScriptReferences();
+
 			Console.WriteLine("\n----------------------------------\n");
 			Console.WriteLine("Welcome to the OSRS Price Checker!");
 			Console.WriteLine("\n----------------------------------\n");
+
+			GetAllItems();
 
 			// Get required input from user
 			ItemType itemType = GetCategoryFromUser();
 			string itemName = GetItemNameFromUser();
 
-			Console.WriteLine(string.Format("\nSearching for 'item': {0}...", itemName));
-
 			// Make API call using the user input
-			DataRetriever dataRetriever = new DataRetriever();
-			dataRetriever.GetItemData(itemType, itemName);
+			dataRetriever.ParseItemData(itemName);
+		}
+
+		private static void InitialiseScriptReferences()
+		{
+			webAPI = new WebAPI();
+			dataRetriever = new DataRetriever();
+		}
+
+		private static async void GetAllItems()
+		{
+			Console.WriteLine("Retrieving item data from API...\n");
+
+			await webAPI.GetCoreItemData();
+
+			Console.WriteLine("Done!\n");
 		}
 
 		private static ItemType GetCategoryFromUser()
@@ -65,7 +84,12 @@ namespace OsrsPriceChecker
 		private static string GetItemNameFromUser()
 		{
 			Console.WriteLine("\n\nEnter the name of the object:");
+
 			return Console.ReadLine();
+
+			// Format string ('example STRING Here' -> 'Example string here')
+
+			// return Helpers.Helper.FirstLetterToUpperCase(Console.ReadLine());
 		}
 	}
 }
