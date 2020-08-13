@@ -8,26 +8,29 @@ namespace OsrsPriceChecker.Common
 	public class Program
 	{
 		public static DataRetriever dataRetriever;
-		public static SearchHandler searchHandler;
-		public static WebAPI webAPI;
+		public static UserInputHandler userInputHandler;
 
-		private static void Main(string[] args)
+		private static void Main()
 		{
-			InitialiseFactories();
-			dataRetriever.FetchCoreData();
+			InitialiseObjects();
 
+			DisplayWelcomeMessage();
+
+			dataRetriever.FetchCoreData();
+			userInputHandler.RetrieveUserInput();
+		}
+
+		private static void InitialiseObjects()
+		{
+			dataRetriever = new DataRetriever();
+			userInputHandler = new UserInputHandler();
+		}
+
+		private static void DisplayWelcomeMessage()
+		{
 			Console.WriteLine("\n----------------------------------\n");
 			Console.WriteLine("Welcome to the OSRS Price Checker!");
 			Console.WriteLine("\n----------------------------------\n");
-
-			searchHandler.InitialiseSearch();
-		}
-
-		private static void InitialiseFactories()
-		{
-			dataRetriever = new DataRetriever();
-			searchHandler = new SearchHandler();
-			webAPI = new WebAPI();
 		}
 	}
 }

@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using OsrsPriceChecker.Connector;
+using OsrsPriceChecker.Data;
 
 namespace OsrsPriceChecker.Common
 {
 	public class DataRetriever
 	{
 		#region Variables
+		private WebAPI webAPI;
+
 		private List<CoreItemData> allItemData = new List<CoreItemData>();
 		private static List<CoreItemData> filteredData = new List<CoreItemData>();
 		#endregion Variables
 
 		public void FetchCoreData()
 		{
-			FetchAllItems();
-		}
+			Console.WriteLine("\nFetching all core data...");
 
-		private void FetchAllItems()
-		{
-			Console.WriteLine("\nFetching all item data...");
+			webAPI = new WebAPI();
 
-			allItemData = Program.webAPI.FetchCoreItemData();
+			allItemData = webAPI.FetchCoreItemData();
+
+			// allWeaponData = Program.webAPI.FetchCoreWeaponData();
+
+			// allEquipmentData = Program.webAPI.FetchCoreEquipmentData();
 
 			Console.WriteLine("Done!");
 		}
@@ -46,7 +47,7 @@ namespace OsrsPriceChecker.Common
 
 		private void ParseFilteredItemData()
 		{
-			List<string> jsonStrings = Program.webAPI.ReturnFilteredItemResults(filteredData);
+			List<string> jsonStrings = webAPI.ReturnFilteredItemResults(filteredData);
 
 			List<Item> items = new List<Item>();
 			for (int i = 0; i < jsonStrings.Count; i++)
@@ -69,7 +70,7 @@ namespace OsrsPriceChecker.Common
 				Console.WriteLine($"The cost of '{items[i].Name}' is: {items[i].Cost.ToString("N0")}gp");
 			}
 
-			Program.searchHandler.EndSearchSequence();
+			Program.userInputHandler.EndSearchSequence();
 		}
 	}
 }

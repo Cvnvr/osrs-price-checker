@@ -1,32 +1,18 @@
 ﻿using Newtonsoft.Json;
-using System;
+using OsrsPriceChecker.Data;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace OsrsPriceChecker.Connector
 {
 	public class WebAPI
 	{
-		#region Variables
-		// Items
-		private readonly string allItemsEndPoint = "https://raw.githubusercontent.com/osrsbox/osrsbox-db/master/docs/items-search.json";
-		private readonly string itemEndPoint = "https://api.osrsbox.com/items";
-
-		// Weapons
-		private readonly string allWeaponsEndPoint = "";
-		private readonly string weaponEndPoint = "https://api.osrsbox.com/weapons";
-
-		// Equipment
-		private readonly string allEquipmentEndPoint = "";
-		private readonly string equipmentEndPoint = "https://api.osrsbox.com/equipment";
-		#endregion Variables
-
 		public List<CoreItemData> FetchCoreItemData()
 		{
-			string jsonString = HttpRequest(allItemsEndPoint);
+			string jsonString = MakeHttpRequest(EndPoints.AllItemsEndPoint);
 			if (string.IsNullOrEmpty(jsonString))
 			{
 				return null;
@@ -36,14 +22,8 @@ namespace OsrsPriceChecker.Connector
 			Dictionary<string, CoreItemData> myDict = JsonConvert.DeserializeObject<Dictionary<string, CoreItemData>>(jsonString);
 			List<CoreItemData> allItems = new List<CoreItemData>(myDict.Values);
 
-			// Remove duplicates from list
-			for (int i = allItems.Count - 1; i >= 0; i--)
-			{
-				if (allItems[i].Duplicate)
-				{
-					allItems.RemoveAt(i);
-				}
-			}
+			// Remove duplicate elements
+			allItems.RemoveAll(item => item.Duplicate);
 
 			return allItems;
 		}
@@ -54,14 +34,14 @@ namespace OsrsPriceChecker.Connector
 
 			for (int i = 0; i < filteredData.Count; i++)
 			{
-				string endPoint = $"{itemEndPoint}/{filteredData[i].Id}";
-				jsonStrings.Add(HttpRequest(endPoint));
+				string endPoint = $"{EndPoints.ItemEndPoint}/{filteredData[i].Id}";
+				jsonStrings.Add(MakeHttpRequest(endPoint));
 			}
 
 			return jsonStrings;
 		}
 
-		private string HttpRequest(string endPoint)
+		private string MakeHttpRequest(string endPoint)
 		{
 			// Contact end point
 			HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(endPoint);

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OsrsPriceChecker.Helpers
 {
@@ -17,10 +15,10 @@ namespace OsrsPriceChecker.Helpers
 			}
 
 			str = str.ToLower();
-			char[] a = str.ToCharArray();
-			a[0] = char.ToUpper(a[0]);
+			char[] chars = str.ToCharArray();
+			chars[0] = char.ToUpper(chars[0]);
 
-			return new string(a);
+			return new string(chars);
 		}
 	}
 }

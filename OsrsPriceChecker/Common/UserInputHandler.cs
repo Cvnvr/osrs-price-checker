@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OsrsPriceChecker.Common
 {
-	public class SearchHandler
+	public class UserInputHandler
 	{
-		public void InitialiseSearch()
+		public void RetrieveUserInput()
 		{
 			// Get required input from user
 			ItemType itemType = GetCategoryFromUser();
-			string itemName = GetItemNameFromUser();
+			string itemName = GetObjectNameFromUser();
 
 			switch (itemType)
 			{
@@ -72,7 +70,7 @@ namespace OsrsPriceChecker.Common
 			#endregion Local Functions
 		}
 
-		private string GetItemNameFromUser()
+		private string GetObjectNameFromUser()
 		{
 			Console.WriteLine("\nEnter the name of the object:");
 
@@ -94,7 +92,7 @@ namespace OsrsPriceChecker.Common
 
 			if (answer.ToLower() == "y")
 			{
-				InitialiseSearch();
+				RetrieveUserInput();
 			}
 			else
 			{
