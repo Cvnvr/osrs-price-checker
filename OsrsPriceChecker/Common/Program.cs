@@ -3,8 +3,6 @@ using System;
 
 namespace OsrsPriceChecker.Common
 {
-	public enum ItemType { Item, Weapon, Equipment };
-
 	public class Program
 	{
 		public static DataRetriever dataRetriever;

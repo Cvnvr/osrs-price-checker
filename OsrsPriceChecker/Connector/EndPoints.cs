@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OsrsPriceChecker.Connector
+﻿namespace OsrsPriceChecker.Connector
 {
 	public static class EndPoints
 	{
-		// Items
-		public const string AllItemsEndPoint = "https://raw.githubusercontent.com/osrsbox/osrsbox-db/master/docs/items-search.json";
-		public const string ItemEndPoint = "https://api.osrsbox.com/items";
+		public const string AllItems = "https://raw.githubusercontent.com/osrsbox/osrsbox-db/master/docs/items-search.json";
 
-		// Weapons
-		public const string AllWeaponsEndPoint = "";
-		public const string WeaponEndPoint = "https://api.osrsbox.com/weapons";
-
-		// Equipment
-		public const string AllEquipmentEndPoint = "";
-		public const string EquipmentEndPoint = "https://api.osrsbox.com/equipment";
+		// Individual search end points
+		public const string ItemSearch = "https://api.osrsbox.com/items";
+		public const string WeaponSearch = "https://api.osrsbox.com/weapons";
+		public const string EquipmentSearch = "https://api.osrsbox.com/equipment";
 	}
 }

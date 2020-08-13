@@ -4,6 +4,8 @@ namespace OsrsPriceChecker.Common
 {
 	public class UserInputHandler
 	{
+		public enum ItemType { Item, Weapon, Equipment };
+
 		public void RetrieveUserInput()
 		{
 			// Get required input from user
@@ -26,48 +28,50 @@ namespace OsrsPriceChecker.Common
 
 		private ItemType GetCategoryFromUser()
 		{
+			string categoryMessage = "\nSelect what category the item belongs to ('item', 'weapon', or 'equipment'):";
+
 			// Determine category from user
-			Console.WriteLine("\nSelect what category the item belongs to ('item', 'weapon', or 'equipment'):");
-			string category = Console.ReadLine();
-			while (!IsCategoryValid())
+			Console.WriteLine(categoryMessage);
+			string response = Console.ReadLine();
+
+			while (!IsCategoryValid(response))
 			{
 				Console.WriteLine("That isn't a valid category\n");
-				Console.WriteLine("Select what category the item belongs to ('item', 'weapon', or 'equipment'):");
-				category = Console.ReadLine();
+				Console.WriteLine(categoryMessage);
+
+				response = Console.ReadLine();
 			}
 
-			return SetItemType();
+			return SetItemType(response);
+		}
 
-			#region Local Functions
-			bool IsCategoryValid()
+		private bool IsCategoryValid(string response)
+		{
+			if (string.IsNullOrEmpty(response))
 			{
-				if (string.IsNullOrEmpty(category))
-				{
-					return false;
-				}
-
-				string categoryLowered = category.ToLower();
-				if (categoryLowered == "item" || categoryLowered == "weapon" || categoryLowered == "equipment")
-				{
-					return true;
-				}
-
 				return false;
 			}
 
-			ItemType SetItemType()
+			string categoryLowered = response.ToLower();
+			if (categoryLowered == "item" || categoryLowered == "weapon" || categoryLowered == "equipment")
 			{
-				switch (category.ToLower())
-				{
-					case "item":
-						return ItemType.Item;
-					case "weapon":
-						return ItemType.Weapon;
-					default:
-						return ItemType.Equipment;
-				}
+				return true;
 			}
-			#endregion Local Functions
+
+			return false;
+		}
+
+		private ItemType SetItemType(string response)
+		{
+			switch (response.ToLower())
+			{
+				case "item":
+					return ItemType.Item;
+				case "weapon":
+					return ItemType.Weapon;
+				default:
+					return ItemType.Equipment;
+			}
 		}
 
 		private string GetObjectNameFromUser()
@@ -81,12 +85,16 @@ namespace OsrsPriceChecker.Common
 		{
 			Console.WriteLine("\n\nSearch complete!\n\n");
 
-			Console.WriteLine("\nSearch for another object? (y/n)");
+			string searchConfirmation = "\nSearch for another object? (y/n)";
+
+			Console.WriteLine(searchConfirmation);
 			string answer = Console.ReadLine();
+
 			while (!InputIsValid())
 			{
 				Console.WriteLine("\nInvalid response.");
-				Console.WriteLine("\nSearch for another object? (y/n)");
+				Console.WriteLine(searchConfirmation);
+
 				answer = Console.ReadLine();
 			}
 
